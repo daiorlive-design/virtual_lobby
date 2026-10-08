@@ -20,7 +20,7 @@ interface RoomCardProps {
   nickname?: string
 }
 
-const BRAINSTORM_CALL_URL = 'https://meet.jit.si/virtual-lobby-brainstorm'
+const BRAINSTORM_CALL_URL = 'https://meet.jit.si/VirtualLobbyBrainstorm2024x'
 
 export default function RoomCard({
   type, emoji, title, subtitle, color, users, isInRoom, onJoin, onLeave, nickname = ''
@@ -72,7 +72,7 @@ export default function RoomCard({
       {type === 'brainstorm' && isInRoom && (
         <div className="mt-4 rounded-xl overflow-hidden border border-black/10" style={{ height: '400px' }}>
           <iframe
-            src={`${BRAINSTORM_CALL_URL}#userInfo.displayName="${encodeURIComponent(nickname)}"&config.startWithVideoMuted=true&config.startWithAudioMuted=false`}
+            src={`${BRAINSTORM_CALL_URL}#userInfo.displayName=${encodeURIComponent(nickname)}&config.startWithVideoMuted=true&config.startWithAudioMuted=false&config.disableModeratorIndicator=true&config.startAudioOnly=false&config.prejoinPageEnabled=false`}
             allow="microphone; screenshare; display-capture"
             style={{ width: '100%', height: '100%', border: 'none' }}
             title="Brainstorm Room call"
