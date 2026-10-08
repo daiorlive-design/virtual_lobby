@@ -17,12 +17,13 @@ interface RoomCardProps {
   isInRoom: boolean
   onJoin: () => void
   onLeave: () => void
+  nickname?: string
 }
 
 const BRAINSTORM_CALL_URL = 'https://whereby.com/virtual-lobby'
 
 export default function RoomCard({
-  type, emoji, title, subtitle, color, users, isInRoom, onJoin, onLeave
+  type, emoji, title, subtitle, color, users, isInRoom, onJoin, onLeave, nickname = ''
 }: RoomCardProps) {
   return (
     <div className={`${color} rounded-2xl p-5 border border-black/5`}>
@@ -71,8 +72,8 @@ export default function RoomCard({
       {type === 'brainstorm' && isInRoom && (
         <div className="mt-4 rounded-xl overflow-hidden border border-black/10" style={{ height: '400px' }}>
           <iframe
-            src={`${BRAINSTORM_CALL_URL}?embed&skipMediaPermissionPrompt`}
-            allow="microphone; camera; screenshare; display-capture"
+            src={`${BRAINSTORM_CALL_URL}?embed&skipMediaPermissionPrompt&displayName=${encodeURIComponent(nickname)}&video=off`}
+            allow="microphone; screenshare; display-capture"
             style={{ width: '100%', height: '100%', border: 'none' }}
             title="Brainstorm Room call"
           />
