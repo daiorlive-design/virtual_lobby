@@ -19,7 +19,7 @@ interface RoomCardProps {
   onLeave: () => void
 }
 
-const BRAINSTORM_DAILY_URL = 'https://virtuallobby.daily.co/Braisntorm'
+const BRAINSTORM_CALL_URL = 'https://whereby.com/virtual-lobby'
 
 export default function RoomCard({
   type, emoji, title, subtitle, color, users, isInRoom, onJoin, onLeave
@@ -71,7 +71,7 @@ export default function RoomCard({
       {type === 'brainstorm' && isInRoom && (
         <div className="mt-4 rounded-xl overflow-hidden border border-black/10" style={{ height: '400px' }}>
           <iframe
-            src={`${BRAINSTORM_DAILY_URL}?camera=off&screenshare=true`}
+            src={`${BRAINSTORM_CALL_URL}?embed&skipMediaPermissionPrompt`}
             allow="microphone; camera; screenshare; display-capture"
             style={{ width: '100%', height: '100%', border: 'none' }}
             title="Brainstorm Room call"
