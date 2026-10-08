@@ -145,6 +145,10 @@ export default function LobbyPage() {
     await trackPresence(currentRoomRef.current, status)
   }, [trackPresence])
 
+  const deletePlan = useCallback((id: string) => {
+    setStudyPlans(prev => prev.filter(p => p.id !== id))
+  }, [])
+
   const addFocusMinutes = useCallback(async (minutes: number) => {
     if (minutes <= 0) return
     const today = new Date().toISOString().split('T')[0]
@@ -262,7 +266,7 @@ export default function LobbyPage() {
         {/* RIGHT: Study Plans + Leaderboard */}
         <div className="space-y-4">
           <div className={activeTab !== 'plans' ? 'hidden md:block' : ''}>
-            <StudyPlans nickname={nickname} plans={studyPlans} />
+            <StudyPlans nickname={nickname} plans={studyPlans} onDelete={deletePlan} />
           </div>
           <div className={activeTab !== 'board' ? 'hidden md:block' : ''}>
             <Leaderboard sessions={leaderboard} myNickname={nickname} />
