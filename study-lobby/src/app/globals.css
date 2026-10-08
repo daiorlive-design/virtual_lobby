@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-dm-sans: 'DM Sans', sans-serif;
+  --font-syne: 'Syne', sans-serif;
+}
+
+body {
+  background-color: #faf8f3;
+  color: #1e2d40;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.font-display {
+  font-family: 'Syne', sans-serif;
+}
