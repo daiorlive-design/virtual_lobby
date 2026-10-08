@@ -20,6 +20,7 @@ function timeAgo(dateStr: string) {
 export default function StudyPlans({ nickname, plans }: StudyPlansProps) {
   const [content, setContent] = useState('')
   const [sending, setSending] = useState(false)
+  const [deleting, setDeleting] = useState<string | null>(null)
 
   const post = async () => {
     const text = content.trim()
@@ -28,6 +29,12 @@ export default function StudyPlans({ nickname, plans }: StudyPlansProps) {
     await supabase.from('study_plans').insert({ nickname, content: text })
     setContent('')
     setSending(false)
+  }
+
+  const deletePlan = async (id: string) => {
+    setDeleting(id)
+    await supabase.from('study_plans').delete().eq('id', id)
+    setDeleting(null)
   }
 
   return (
@@ -65,7 +72,17 @@ export default function StudyPlans({ nickname, plans }: StudyPlansProps) {
           <div key={plan.id} className="bg-gray-50 rounded-xl px-3 py-2">
             <div className="flex items-center gap-2 mb-1">
               <span className="font-display font-bold text-navy text-xs">{plan.nickname}</span>
-              <span className="text-xs text-gray-400">{timeAgo(plan.created_at)}</span>
+              <span className="text-xs text-gray-400 flex-1">{timeAgo(plan.created_at)}</span>
+              {plan.nickname === nickname && (
+                <button
+                  onClick={() => deletePlan(plan.id)}
+                  disabled={deleting === plan.id}
+                  className="text-xs text-gray-300 hover:text-red-400 transition-colors disabled:opacity-40"
+                  title="Delete"
+                >
+                  {deleting === plan.id ? '...' : '✕'}
+                </button>
+              )}
             </div>
             <p className="text-sm text-gray-700">{plan.content}</p>
           </div>
