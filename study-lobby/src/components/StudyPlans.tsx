@@ -5,6 +5,7 @@ import { supabase, type StudyPlan } from '@/lib/supabase'
 interface StudyPlansProps {
   nickname: string
   plans: StudyPlan[]
+  onDelete: (id: string) => void
 }
 
 function timeAgo(dateStr: string) {
@@ -17,7 +18,7 @@ function timeAgo(dateStr: string) {
   return `${Math.floor(hrs / 24)}d ago`
 }
 
-export default function StudyPlans({ nickname, plans }: StudyPlansProps) {
+export default function StudyPlans({ nickname, plans, onDelete }: StudyPlansProps) {
   const [content, setContent] = useState('')
   const [sending, setSending] = useState(false)
   const [deleting, setDeleting] = useState<string | null>(null)
@@ -33,6 +34,7 @@ export default function StudyPlans({ nickname, plans }: StudyPlansProps) {
 
   const deletePlan = async (id: string) => {
     setDeleting(id)
+    onDelete(id) // remove immediately from UI
     await supabase.from('study_plans').delete().eq('id', id)
     setDeleting(null)
   }
@@ -41,7 +43,6 @@ export default function StudyPlans({ nickname, plans }: StudyPlansProps) {
     <div className="bg-white rounded-2xl p-5 border border-black/5 shadow-sm">
       <h3 className="font-display font-bold text-navy text-base mb-3">📋 Study Plans</h3>
 
-      {/* Post input */}
       <div className="mb-4">
         <textarea
           value={content}
@@ -61,7 +62,6 @@ export default function StudyPlans({ nickname, plans }: StudyPlansProps) {
         </button>
       </div>
 
-      {/* Plans feed */}
       <div className="space-y-2 max-h-64 overflow-y-auto">
         {plans.length === 0 && (
           <p className="text-sm text-gray-400 italic text-center py-4">
