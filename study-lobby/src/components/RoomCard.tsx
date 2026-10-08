@@ -20,7 +20,7 @@ interface RoomCardProps {
   nickname?: string
 }
 
-const BRAINSTORM_CALL_URL = 'https://meet.jit.si/VirtualStudyLobbyBrainstorm'
+const BRAINSTORM_CALL_URL = 'https://meet.google.com/gev-pfut-ygk'
 
 export default function RoomCard({
   type, emoji, title, subtitle, color, users, isInRoom, onJoin, onLeave, nickname = ''
@@ -75,7 +75,7 @@ export default function RoomCard({
             🎙️ Clique para entrar na chamada de voz da sala
           </p>
           <a
-            href={`${BRAINSTORM_CALL_URL}#userInfo.displayName=${encodeURIComponent(nickname)}&config.startWithVideoMuted=true&config.startWithAudioMuted=false&config.prejoinPageEnabled=false&config.disableDeepLinking=true`}
+            href={BRAINSTORM_CALL_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block bg-teal text-white font-display font-bold text-sm px-5 py-2 rounded-xl hover:bg-navy transition-colors"
