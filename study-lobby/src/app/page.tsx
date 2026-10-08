@@ -110,10 +110,17 @@ export default function LobbyPage() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'focus_sessions' }, fetchLeaderboard)
       .subscribe()
 
+    // Fallback polling every 5 seconds
+    const pollInterval = setInterval(() => {
+      fetchPlans()
+      fetchLeaderboard()
+    }, 5000)
+
     return () => {
       ch.unsubscribe()
       plansSubscription.unsubscribe()
       lbSubscription.unsubscribe()
+      clearInterval(pollInterval)
     }
   }, [nickname, fetchPlans, fetchLeaderboard])
 
