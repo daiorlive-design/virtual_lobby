@@ -36,7 +36,16 @@ export default function RoomCard({
           <p className="text-sm text-gray-500">{subtitle}</p>
         </div>
         <button
-          onClick={isInRoom ? onLeave : onJoin}
+          onClick={() => {
+            if (isInRoom) {
+              onLeave()
+            } else {
+              onJoin()
+              if (type === 'brainstorm') {
+                window.open(BRAINSTORM_CALL_URL, '_blank')
+              }
+            }
+          }}
           className={`text-sm font-display font-bold px-4 py-2 rounded-xl transition-colors shrink-0 ${
             isInRoom
               ? 'bg-navy text-white hover:bg-teal'
@@ -68,21 +77,17 @@ export default function RoomCard({
         {users.length} {users.length === 1 ? 'student' : 'students'} online
       </div>
 
-      {/* Voice call link for Brainstorm room */}
+      {/* Rejoin call link if already in brainstorm */}
       {type === 'brainstorm' && isInRoom && (
-        <div className="mt-4 bg-white/70 rounded-xl border border-black/10 p-4 text-center">
-          <p className="text-sm text-gray-600 mb-3">
-            🎙️ Clique para entrar na chamada de voz da sala
-          </p>
+        <div className="mt-3">
           <a
             href={BRAINSTORM_CALL_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block bg-teal text-white font-display font-bold text-sm px-5 py-2 rounded-xl hover:bg-navy transition-colors"
+            className="text-xs text-teal hover:underline"
           >
-            Entrar na chamada →
+            🔗 Rejoin call
           </a>
-          <p className="text-xs text-gray-400 mt-2">Abre em nova aba • Sem login • Microfone + compartilhamento de tela</p>
         </div>
       )}
     </div>
