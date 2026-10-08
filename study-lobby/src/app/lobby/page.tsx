@@ -277,7 +277,7 @@ export default function LobbyPage() {
             <StudyPlans nickname={nickname} plans={studyPlans} onDelete={deletePlan} />
           </div>
           <div className={activeTab !== 'board' ? 'hidden md:block' : ''}>
-            <Leaderboard sessions={leaderboard} myNickname={nickname} />
+            <Leaderboard myNickname={nickname} />
           </div>
         </div>
 
