@@ -20,7 +20,7 @@ interface RoomCardProps {
   nickname?: string
 }
 
-const BRAINSTORM_CALL_URL = 'https://8x8.vc/virtuallobby/brainstorm'
+const BRAINSTORM_CALL_URL = 'https://meet.jit.si/VirtualStudyLobbyBrainstorm'
 
 export default function RoomCard({
   type, emoji, title, subtitle, color, users, isInRoom, onJoin, onLeave, nickname = ''
@@ -68,15 +68,21 @@ export default function RoomCard({
         {users.length} {users.length === 1 ? 'student' : 'students'} online
       </div>
 
-      {/* Daily.co embed for Brainstorm room */}
+      {/* Voice call link for Brainstorm room */}
       {type === 'brainstorm' && isInRoom && (
-        <div className="mt-4 rounded-xl overflow-hidden border border-black/10" style={{ height: '400px' }}>
-          <iframe
-            src={`${BRAINSTORM_CALL_URL}#userInfo.displayName=${encodeURIComponent(nickname)}&config.startWithVideoMuted=true&config.prejoinPageEnabled=false`}
-            allow="microphone; camera; screenshare; display-capture"
-            style={{ width: '100%', height: '100%', border: 'none' }}
-            title="Brainstorm Room call"
-          />
+        <div className="mt-4 bg-white/70 rounded-xl border border-black/10 p-4 text-center">
+          <p className="text-sm text-gray-600 mb-3">
+            🎙️ Clique para entrar na chamada de voz da sala
+          </p>
+          <a
+            href={`${BRAINSTORM_CALL_URL}#userInfo.displayName=${encodeURIComponent(nickname)}&config.startWithVideoMuted=true&config.startWithAudioMuted=false&config.prejoinPageEnabled=false&config.disableDeepLinking=true`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block bg-teal text-white font-display font-bold text-sm px-5 py-2 rounded-xl hover:bg-navy transition-colors"
+          >
+            Entrar na chamada →
+          </a>
+          <p className="text-xs text-gray-400 mt-2">Abre em nova aba • Sem login • Microfone + compartilhamento de tela</p>
         </div>
       )}
     </div>
