@@ -13,6 +13,22 @@ const PRESETS = [
   { label: '15 / 3', focus: 15, brk: 3 },
 ]
 
+function playBeep() {
+  try {
+    const ctx = new AudioContext()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.type = 'sine'
+    osc.frequency.value = 880
+    gain.gain.setValueAtTime(0.5, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2)
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + 1.2)
+  } catch {}
+}
+
 export default function Pomodoro({ onComplete }: PomodoroProps) {
   const [preset, setPreset] = useState(0)
   const [phase, setPhase] = useState<Phase>('focus')
@@ -52,10 +68,12 @@ export default function Pomodoro({ onComplete }: PomodoroProps) {
             onComplete(mins)
             setSessions(n => n + 1)
             setPhase('break')
+            playBeep()
             setRunning(false)
             return breakSecs
           } else {
             setPhase('focus')
+            playBeep()
             setRunning(false)
             return focusSecs
           }
