@@ -13,9 +13,20 @@ const PRESETS = [
   { label: '15 / 3', focus: 15, brk: 3 },
 ]
 
-function playBeep() {
+let audioCtx: AudioContext | null = null
+
+function getAudioCtx(): AudioContext | null {
   try {
-    const ctx = new AudioContext()
+    if (!audioCtx) audioCtx = new AudioContext()
+    if (audioCtx.state === 'suspended') audioCtx.resume()
+    return audioCtx
+  } catch { return null }
+}
+
+function playBeep() {
+  const ctx = getAudioCtx()
+  if (!ctx) return
+  try {
     const osc = ctx.createOscillator()
     const gain = ctx.createGain()
     osc.connect(gain)
@@ -23,9 +34,9 @@ function playBeep() {
     osc.type = 'sine'
     osc.frequency.value = 880
     gain.gain.setValueAtTime(0.5, ctx.currentTime)
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5)
     osc.start(ctx.currentTime)
-    osc.stop(ctx.currentTime + 1.2)
+    osc.stop(ctx.currentTime + 1.5)
   } catch {}
 }
 
@@ -85,6 +96,7 @@ export default function Pomodoro({ onComplete }: PomodoroProps) {
   }, [running, phase, focusSecs, breakSecs, onComplete])
 
   const start = () => {
+    getAudioCtx() // unlock audio on user gesture
     startSecondsRef.current = seconds
     setRunning(true)
   }
