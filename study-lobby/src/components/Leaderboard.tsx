@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase'
 
 interface LeaderboardProps {
   myNickname: string
+  refreshKey?: number
 }
 
 interface Entry {
@@ -40,7 +41,7 @@ const LABELS: Record<Period, string> = {
   all: 'All Time',
 }
 
-export default function Leaderboard({ myNickname }: LeaderboardProps) {
+export default function Leaderboard({ myNickname, refreshKey = 0 }: LeaderboardProps) {
   const [period, setPeriod] = useState<Period>('today')
   const [entries, setEntries] = useState<Entry[]>([])
 
@@ -64,7 +65,7 @@ export default function Leaderboard({ myNickname }: LeaderboardProps) {
       setEntries(sorted)
     }
     fetch()
-  }, [period])
+  }, [period, refreshKey])
 
   return (
     <div className="bg-white rounded-2xl p-5 border border-black/5 shadow-sm">
