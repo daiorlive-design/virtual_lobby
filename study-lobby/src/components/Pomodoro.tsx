@@ -13,45 +13,40 @@ const PRESETS = [
   { label: '15 / 3', focus: 15, brk: 3 },
 ]
 
-let audioCtx: AudioContext | null = null
-
-function getAudioCtx(): AudioContext | null {
-  try {
-    if (!audioCtx) audioCtx = new AudioContext()
-    if (audioCtx.state === 'suspended') audioCtx.resume()
-    return audioCtx
-  } catch { return null }
-}
-
-function playBeep() {
-  const ctx = getAudioCtx()
-  if (!ctx) return
-  try {
-    const osc = ctx.createOscillator()
-    const gain = ctx.createGain()
-    osc.connect(gain)
-    gain.connect(ctx.destination)
-    osc.type = 'sine'
-    osc.frequency.value = 880
-    gain.gain.setValueAtTime(0.5, ctx.currentTime)
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5)
-    osc.start(ctx.currentTime)
-    osc.stop(ctx.currentTime + 1.5)
-  } catch {}
-}
-
 export default function Pomodoro({ onComplete }: PomodoroProps) {
   const [preset, setPreset] = useState(0)
   const [phase, setPhase] = useState<Phase>('focus')
   const [seconds, setSeconds] = useState(PRESETS[0].focus * 60)
   const [running, setRunning] = useState(false)
   const [sessions, setSessions] = useState(0)
+  const [beepTrigger, setBeepTrigger] = useState(0)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
   const startSecondsRef = useRef(0)
+  const audioCtxRef = useRef<AudioContext | null>(null)
 
   const focusSecs = PRESETS[preset].focus * 60
   const breakSecs = PRESETS[preset].brk * 60
   const totalSecs = phase === 'focus' ? focusSecs : breakSecs
+
+  // Play beep whenever beepTrigger increments
+  useEffect(() => {
+    if (beepTrigger === 0) return
+    try {
+      const ctx = audioCtxRef.current
+      if (!ctx) return
+      if (ctx.state === 'suspended') ctx.resume()
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.type = 'sine'
+      osc.frequency.value = 880
+      gain.gain.setValueAtTime(0.6, ctx.currentTime)
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5)
+      osc.start(ctx.currentTime)
+      osc.stop(ctx.currentTime + 1.5)
+    } catch {}
+  }, [beepTrigger])
 
   const stop = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current)
@@ -73,18 +68,17 @@ export default function Pomodoro({ onComplete }: PomodoroProps) {
     intervalRef.current = setInterval(() => {
       setSeconds(s => {
         if (s <= 1) {
-          // Phase complete
           if (phase === 'focus') {
             const mins = Math.round((startSecondsRef.current) / 60)
             onComplete(mins)
             setSessions(n => n + 1)
             setPhase('break')
-            playBeep()
+            setBeepTrigger(n => n + 1)
             setRunning(false)
             return breakSecs
           } else {
             setPhase('focus')
-            playBeep()
+            setBeepTrigger(n => n + 1)
             setRunning(false)
             return focusSecs
           }
@@ -96,7 +90,11 @@ export default function Pomodoro({ onComplete }: PomodoroProps) {
   }, [running, phase, focusSecs, breakSecs, onComplete])
 
   const start = () => {
-    getAudioCtx() // unlock audio on user gesture
+    // Create / unlock AudioContext on user gesture
+    try {
+      if (!audioCtxRef.current) audioCtxRef.current = new AudioContext()
+      if (audioCtxRef.current.state === 'suspended') audioCtxRef.current.resume()
+    } catch {}
     startSecondsRef.current = seconds
     setRunning(true)
   }
