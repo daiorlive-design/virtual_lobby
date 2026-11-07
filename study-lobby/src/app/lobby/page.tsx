@@ -22,6 +22,7 @@ export default function LobbyPage() {
   const [studyPlans, setStudyPlans] = useState<StudyPlan[]>([])
   const [leaderboard, setLeaderboard] = useState<FocusSession[]>([])
   const [activeTab, setActiveTab] = useState<'rooms' | 'plans' | 'board'>('rooms')
+  const [leaderboardKey, setLeaderboardKey] = useState(0)
 
   const channelRef = useRef<any>(null)
   const currentRoomRef = useRef<Room | null>(null)
@@ -135,14 +136,15 @@ export default function LobbyPage() {
   }, [])
 
   const joinRoom = useCallback(async (room: Room) => {
-    setCurrentRoom(room)
     currentRoomRef.current = room
+    setCurrentRoom(room)
     await trackPresence(room, myStatusRef.current)
+    setTimeout(() => trackPresence(room, myStatusRef.current), 800)
   }, [trackPresence])
 
   const leaveRoom = useCallback(async () => {
-    setCurrentRoom(null)
     currentRoomRef.current = null
+    setCurrentRoom(null)
     await trackPresence(null, myStatusRef.current)
   }, [trackPresence])
 
@@ -177,10 +179,11 @@ export default function LobbyPage() {
         .insert({ nickname: nicknameRef.current, minutes, date: today })
     }
     fetchLeaderboard()
+    setLeaderboardKey(k => k + 1)
   }, [fetchLeaderboard])
 
-  const silentUsers = onlineUsers.filter(u => u.room === 'silent')
-  const brainstormUsers = onlineUsers.filter(u => u.room === 'brainstorm')
+  const silentUsers = onlineUsers.filter(u => String(u.room) === 'silent')
+  const brainstormUsers = onlineUsers.filter(u => String(u.room) === 'brainstorm')
 
   if (!nickname) return null
 
@@ -277,7 +280,7 @@ export default function LobbyPage() {
             <StudyPlans nickname={nickname} plans={studyPlans} onDelete={deletePlan} />
           </div>
           <div className={activeTab !== 'board' ? 'hidden md:block' : ''}>
-            <Leaderboard myNickname={nickname} />
+            <Leaderboard myNickname={nickname} refreshKey={leaderboardKey} />
           </div>
         </div>
 
