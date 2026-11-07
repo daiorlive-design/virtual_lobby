@@ -16,13 +16,17 @@ type Period = 'today' | 'week' | 'month' | 'year' | 'all'
 
 const medals = ['🥇', '🥈', '🥉']
 
+function localDateStr(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
 function getDateRange(period: Period): string | null {
   const now = new Date()
-  if (period === 'today') return now.toISOString().split('T')[0]
+  if (period === 'today') return localDateStr(now)
   if (period === 'week') {
     const d = new Date(now)
     d.setDate(d.getDate() - 6)
-    return d.toISOString().split('T')[0]
+    return localDateStr(d)
   }
   if (period === 'month') {
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
@@ -30,7 +34,7 @@ function getDateRange(period: Period): string | null {
   if (period === 'year') {
     return `${now.getFullYear()}-01-01`
   }
-  return null // all time
+  return null
 }
 
 const LABELS: Record<Period, string> = {
