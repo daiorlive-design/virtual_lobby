@@ -1,4 +1,5 @@
 'use client'
+export const dynamic = 'force-dynamic'
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase, type Room, type StudyPlan, type FocusSession } from '@/lib/supabase'
@@ -23,6 +24,7 @@ export default function LobbyPage() {
   const [leaderboard, setLeaderboard] = useState<FocusSession[]>([])
   const [activeTab, setActiveTab] = useState<'rooms' | 'plans' | 'board'>('rooms')
   const [leaderboardKey, setLeaderboardKey] = useState(0)
+  const [showDisclaimer, setShowDisclaimer] = useState(false)
 
   const channelRef = useRef<any>(null)
   const currentRoomRef = useRef<Room | null>(null)
@@ -40,6 +42,9 @@ export default function LobbyPage() {
     if (!name) { router.push('/'); return }
     setNickname(name)
     nicknameRef.current = name
+    // Show disclaimer only on first visit
+    const seen = localStorage.getItem('disclaimer_seen')
+    if (!seen) setShowDisclaimer(true)
   }, [router])
 
   // Fetch plans helper
@@ -54,7 +59,8 @@ export default function LobbyPage() {
 
   // Fetch leaderboard helper
   const fetchLeaderboard = useCallback(() => {
-    const today = new Date().toISOString().split('T')[0]
+    const d = new Date()
+    const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
     supabase
       .from('focus_sessions')
       .select('*')
@@ -160,7 +166,8 @@ export default function LobbyPage() {
 
   const addFocusMinutes = useCallback(async (minutes: number) => {
     if (minutes <= 0) return
-    const today = new Date().toISOString().split('T')[0]
+    const d = new Date()
+    const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
     const { data: existing } = await supabase
       .from('focus_sessions')
       .select('id, minutes')
@@ -285,6 +292,31 @@ export default function LobbyPage() {
         </div>
 
       </div>
+
+      {/* Disclaimer modal */}
+      {showDisclaimer && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <h2 className="font-display font-bold text-navy text-lg mb-3">👋 Welcome to the Virtual Study Lobby</h2>
+            <p className="text-sm text-gray-600 mb-3">Before you start, please keep in mind:</p>
+            <ul className="text-sm text-gray-600 space-y-2 mb-5 list-none">
+              <li>🔒 <span className="font-semibold">Do not share personal information</span> — avoid your full name, address, phone number, or any private details.</li>
+              <li>🤝 <span className="font-semibold">Be respectful</span> — this is a shared study space. Keep it kind and focused.</li>
+              <li>📋 <span className="font-semibold">Study plans are public</span> — anything you post can be seen by everyone in the lobby.</li>
+              <li>🎓 <span className="font-semibold">This is a research prototype</span> — it may be used for academic purposes.</li>
+            </ul>
+            <button
+              onClick={() => {
+                localStorage.setItem('disclaimer_seen', 'true')
+                setShowDisclaimer(false)
+              }}
+              className="w-full bg-navy text-white font-display font-bold py-2 rounded-xl hover:bg-teal transition-colors text-sm"
+            >
+              I understand — let's study! 📚
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   )
 }
